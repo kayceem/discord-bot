@@ -7,7 +7,7 @@
     },
     {
       "emoji": "📍",
-      "label": "Track",
+      "label": "",
       "fields": ["track", "race", "number"]
     },
     {
