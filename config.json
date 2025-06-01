@@ -1,0 +1,24 @@
+{
+  "format_template": [
+    {
+      "emoji": "🏇",
+      "label": "",
+      "field": "horse_name"
+    },
+    {
+      "emoji": "📍",
+      "label": "Track",
+      "fields": ["track", "race", "number"]
+    },
+    {
+      "emoji": "🕐",
+      "label": "Race Time",
+      "field": "race_time"
+    },
+    {
+      "emoji": "💰",
+      "label": "Units",
+      "field": "units"
+    }
+  ]
+}
