@@ -1,9 +1,13 @@
-import json
-from logging.handlers import RotatingFileHandler
 import os
-from pathlib import Path
-from datetime import datetime 
+import json
 import logging
+from pathlib import Path
+from zoneinfo import ZoneInfo
+from datetime import datetime 
+from dotenv import load_dotenv
+from logging.handlers import RotatingFileHandler
+
+load_dotenv()
 
 CSV_FIELD_MAP = {
     "horse_name": "First Selection Name",
@@ -13,8 +17,8 @@ CSV_FIELD_MAP = {
     "race_time": "Race Time",
     "units": "Units"
 }
+
 DIR = Path(__file__).parent
-SENT_CACHE_PATH = DIR / 'logs' / Path("sent_races.json")
 
 def get_logger(name: str, log_file: str = "log.log"):
     os.makedirs("logs", exist_ok=True)
@@ -35,47 +39,60 @@ def get_logger(name: str, log_file: str = "log.log"):
 
     return logger
 
-def load_sent_cache():
-    if SENT_CACHE_PATH.exists():
-        with open(SENT_CACHE_PATH, 'r') as f:
-            return set(json.load(f))
-    return set()
+def get_csv_path():
+    CSV_PATH = Path(os.getenv("CSV_PATH", DIR))
+    DATE = datetime.now().strftime("%Y-%m-%d")
 
-def save_sent_cache(sent_id):
-    sent_ids = []
-    if SENT_CACHE_PATH.exists():
-        with open(SENT_CACHE_PATH, 'r') as f:
-            sent_ids = json.load(f)
-    sent_ids.append(sent_id)
-    with open(SENT_CACHE_PATH, 'w') as f:
-        json.dump(list(set(sent_ids)), f)
+    if not CSV_PATH.is_file():
+        CSV_PATH = CSV_PATH / f"{DATE}.csv"
+
+    if not CSV_PATH.exists():
+        return None
+
+    return CSV_PATH.resolve()
+
+def get_now():
+    try:
+        TIMEZONE = os.getenv("TIMEZONE", "Australia/Sydney")
+        tz = ZoneInfo(TIMEZONE)
+    except Exception as e:
+        tz = ZoneInfo("Australia/Sydney")
+    return datetime.now(tz=tz)
 
 def safe_get(row, key):
     return str(row.get(key, "")).strip()
 
 def validate_dataframe(df):
-    """ Validates the DataFrame to ensure it contains the required columns and valid data types."""
     required = ["Track", "Race Time", "First Selection Name", "Selection", "Units"]
-    df = df.dropna(subset=required)
-    df = df[
-        df["Units"].apply(lambda x: isinstance(x, (int, float)) or str(x).replace('.', '', 1).isdigit()) &
-        df["Selection"].apply(lambda x: str(x).isdigit())
-    ]
-    return df
+    try:
+        df = df.dropna(subset=required)
+        df = df[
+            df["Units"].apply(lambda x: isinstance(x, (int, float)) or str(x).replace('.', '', 1).isdigit()) &
+            df["Selection"].apply(lambda x: str(x).isdigit())
+        ]
+        return df
+    except Exception as e:
+        return None
+    
 
 def parse_race_time(row):
+    try:
+        TIMEZONE = os.getenv("TIMEZONE", "Australia/Sydney")
+        tz = ZoneInfo(TIMEZONE)
+    except Exception as e:
+        tz = ZoneInfo("Australia/Sydney")
     try:
         time_str = str(row.get("Race Time", "")).strip()
         race_time = datetime.strptime(time_str, "%H:%M").replace(
             year=datetime.now().year,
             month=datetime.now().month,
             day=datetime.now().day
-        )
+        ).replace(tzinfo=tz)
         return race_time
     except Exception as e:
         return None
+    
 def get_message_config():
-    """Loads the message configuration from a JSON file."""
     config_path = Path("config.json")
     if not config_path.exists():
         return {
@@ -107,7 +124,6 @@ def get_message_config():
         return json.load(f)
     
 def format_embed_message(row):
-    """Formats the message for Discord embed based on the row data."""
     message_config = get_message_config()
     lines = []
     for block in message_config["format_template"]:
