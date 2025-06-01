@@ -16,7 +16,7 @@ TIMEOUT = 10
 WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 ALERT_THRESHOLD = int(os.getenv("ALERT_THRESHOLD", 10))
 
-def wait_until_done(scheduler, poll_interval=300):
+def wait_until_done(scheduler, poll_interval=1800):
     try:
         while True:
             if len(scheduler.get_jobs()) == 0:

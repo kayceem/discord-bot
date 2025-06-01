@@ -1,3 +1,4 @@
+import asyncio
 import os
 import discord
 import pandas as pd
@@ -31,6 +32,14 @@ async def on_ready():
             return
     await schedule_races()
 
+async def monitor_jobs(interval=1800):
+    """Wait for all jobs to finish and then shut down the bot and scheduler."""
+    while True:
+        if not scheduler.get_jobs():
+            log.info("Scheduled jobs completed.")
+            await bot.close()
+            break
+        await asyncio.sleep(interval)
 
 async def send_discord_message(message, row_id: str):
     """Sends a message to the Discord channel."""
@@ -84,6 +93,7 @@ async def schedule_races():
 
         scheduler.start()
         log.info("Scheduled all alerts.")
+        asyncio.create_task(monitor_jobs())
         
     except Exception as e:
         log.error(f"Error scheduling: {e}")
