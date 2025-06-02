@@ -1,6 +1,13 @@
 $ProjectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ExePath = Join-Path $ProjectDir "discord_scheduler_bot.exe"
-$TaskName = "DiscordSchedulerBot"
+$EnvExamplePath = Join-Path $ProjectDir ".env_example"
+$EnvPath = Join-Path $ProjectDir ".env"
+$TaskName = "DiscordSchedulerExe"
+
+if (!(Test-Path $EnvPath) -and (Test-Path $EnvExamplePath)) {
+    Copy-Item $EnvExamplePath $EnvPath
+    Write-Host "Copied .env_example to .env`n"
+}
 
 if (!(Test-Path $ExePath)) {
     Write-Host "Executable not found. Please ensure the bot is compiled to an executable."
