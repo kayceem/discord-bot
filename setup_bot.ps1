@@ -51,6 +51,13 @@ if (!(Test-Path $ScriptPath)) {
     exit 1
 }
 
+$addToScheduler = Read-Host "`nDo you want to schedule this script to run daily via Task Scheduler? (y/n)"
+
+if ($addToScheduler -notmatch '^[Yy]$') {
+    Write-Host "`nSetup completed. Skipping Task Scheduler configuration."
+    exit 0
+}
+
 $ScheduledTime = Read-Host "`nEnter the time to run the bot daily (24-hour format, e.g., 14:00)"
 
 if (-not ($ScheduledTime -match '^\d{1,2}:\d{2}$')) {
