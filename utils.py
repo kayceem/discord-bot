@@ -52,6 +52,7 @@ def get_csv_path():
         candidate = default_dir / f"{date_str}.csv"
         return candidate.resolve() if candidate.exists() else None
 
+    env_path = env_path.strip().replace("\\", "/")
     path = Path(env_path)
 
     if path.is_file():
@@ -60,10 +61,7 @@ def get_csv_path():
     if path.is_dir():
         candidate = path / f"{date_str}.csv"
         return candidate.resolve() if candidate.exists() else None
-
-    if path.suffix == ".csv":
-        return path.resolve()
-
+        
     return None
 
 def get_now():
