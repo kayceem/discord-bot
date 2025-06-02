@@ -28,11 +28,12 @@ This bot sends scheduled race alerts to a Discord channel by reading a CSV file 
 
    ```powershell
    cd "C:\DiscordSchedulerBot"
-   .\setup.ps1
+   .\setup_bot.ps1
    ```
 
 4. **Follow the Prompts**
 
+   * Enter whether you want to run as bot(default) or webhook
    * Enter the time to schedule the bot (e.g., `10:00AM`)
    * The script will:
 
