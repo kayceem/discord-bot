@@ -44,16 +44,27 @@ def get_logger(name: str, log_file: str = "log.log"):
     return logger
 
 def get_csv_path():
-    CSV_PATH = Path(os.getenv("CSV_PATH", DIR))
-    DATE = datetime.now().strftime("%Y-%m-%d")
+    env_path = os.getenv("CSV_PATH")
+    default_dir = Path(__file__).parent
+    date_str = datetime.now().strftime("%Y-%m-%d")
 
-    if not CSV_PATH.is_file():
-        CSV_PATH = CSV_PATH / f"{DATE}.csv"
+    if not env_path:
+        candidate = default_dir / f"{date_str}.csv"
+        return candidate.resolve() if candidate.exists() else None
 
-    if not CSV_PATH.exists():
-        return None
+    path = Path(env_path)
 
-    return CSV_PATH.resolve()
+    if path.is_file():
+        return path.resolve()
+
+    if path.is_dir():
+        candidate = path / f"{date_str}.csv"
+        return candidate.resolve() if candidate.exists() else None
+
+    if path.suffix == ".csv":
+        return path.resolve()
+
+    return None
 
 def get_now():
     try:

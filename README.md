@@ -34,7 +34,7 @@ This bot sends scheduled race alerts to a Discord channel by reading a CSV file 
 4. **Follow the Prompts**
 
    * Enter whether you want to run as bot(default) or webhook
-   * Enter the time to schedule the bot (e.g., `10:00AM`)
+   * Enter the time to schedule the bot (e.g., `14:00`)
    * The script will:
 
      * Create a virtual environment
