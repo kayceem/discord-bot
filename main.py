@@ -57,6 +57,7 @@ async def schedule_races():
         csv_path = get_csv_path()
         if not csv_path:
             log.error("CSV file missing or invalid path.")
+            await bot.close()
             return
         
         df = pd.read_csv(csv_path)
