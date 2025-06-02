@@ -11,3 +11,4 @@ wheels/
 *.csv
 logs/
 .env
+csv/
