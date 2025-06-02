@@ -3,6 +3,8 @@ $VenvPath = Join-Path $ProjectDir "venv"
 $PythonExe = Join-Path $VenvPath "Scripts\python.exe"
 $ScriptPath = Join-Path $ProjectDir "main.py"
 $Requirements = Join-Path $ProjectDir "requirements.txt"
+$EnvExamplePath = Join-Path $ProjectDir ".env_example"
+$EnvPath = Join-Path $ProjectDir ".env"
 $TaskName = "DiscordSchedulerBot"
 
 if (!(Test-Path $VenvPath)) {
@@ -20,6 +22,10 @@ Write-Host "Installing dependencies from requirements.txt..."
 & $PythonExe -m pip install --upgrade pip
 & $PythonExe -m pip install -r $Requirements
 
+if (!(Test-Path $EnvPath) -and (Test-Path $EnvExamplePath)) {
+    Copy-Item $EnvExamplePath $EnvPath
+    Write-Host "Copied .env_example to .env"
+}
 
 $ScheduledTime = Read-Host "Enter the time to run the bot daily (24-hour format, e.g., 14:00)"
 
