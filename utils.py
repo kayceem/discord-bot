@@ -34,8 +34,12 @@ def get_logger(name: str, log_file: str = "log.log"):
     file_handler = RotatingFileHandler(log_path, maxBytes=5_000_000, backupCount=5)
     file_handler.setFormatter(formatter)
 
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
     if not logger.handlers:
         logger.addHandler(file_handler)
+        logger.addHandler(console_handler)
 
     return logger
 
@@ -120,7 +124,7 @@ def get_message_config():
             ]
             }
     
-    with open(config_path, 'r') as f:
+    with open(config_path, 'r', encoding='utf-8') as f:
         return json.load(f)
     
 def format_embed_message(row):
