@@ -26,10 +26,6 @@ scheduler = AsyncIOScheduler()
 @bot.event
 async def on_ready():
     log.info(f"Bot is ready: {bot.user}")
-    channel = bot.get_channel(CHANNEL_ID)
-    if not channel:
-            log.error("Channel not found")
-            return
     await schedule_races()
 
 async def monitor_jobs(interval=1800):
@@ -41,11 +37,22 @@ async def monitor_jobs(interval=1800):
             break
         await asyncio.sleep(interval)
 
-async def send_discord_message(message, row_id: str):
+async def send_discord_message(message, row_id: str, channel_id: str):
     """Sends a message to the Discord channel."""
+    channel = None
     try:
         log.info(f"Sending message for row ID: {row_id}")
-        channel = bot.get_channel(CHANNEL_ID)
+        if channel_id:
+            channel = bot.get_channel(int(channel_id))
+            if not channel:
+                log.warning(f"Channel with ID {channel_id} not found, falling back to default.")
+
+        if not channel:
+            channel = bot.get_channel(CHANNEL_ID)
+            if not channel:
+                log.error(f"Default channel with ID {CHANNEL_ID} not found.")
+                return
+            
         await channel.send(embed=message)
         log.info(f"Message sent for row ID: {row_id}")
     except Exception as e:
@@ -87,7 +94,7 @@ async def schedule_races():
                 send_discord_message,
                 'date',
                 run_date=send_time,
-                args=[embed, row_id],
+                args=[embed, row_id, row['Channel Id']],
                 id=f"race_{idx}",
                 misfire_grace_time=60
             )

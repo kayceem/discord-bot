@@ -79,6 +79,8 @@ def validate_dataframe(df):
     required = ["Track", "Race Time", "First Selection Name", "Selection", "Units"]
     try:
         df = df.dropna(subset=required)
+        if "Channel Id" not in df.columns:
+            df["Channel Id"] = ""
         df = df[
             df["Units"].apply(lambda x: isinstance(x, (int, float)) or str(x).replace('.', '', 1).isdigit()) &
             df["Selection"].apply(lambda x: str(x).isdigit())
