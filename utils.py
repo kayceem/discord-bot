@@ -45,6 +45,7 @@ def get_logger(name: str, log_file: str = "log.log"):
 
 def get_csv_path():
     env_path = os.getenv("CSV_PATH")
+    print(f"CSV_PATH: {env_path}")
     default_dir = Path(__file__).parent
     date_str = datetime.now().strftime("%Y-%m-%d")
 
